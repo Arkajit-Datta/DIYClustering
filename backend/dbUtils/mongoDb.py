@@ -5,9 +5,10 @@ class baseDb:
         self.client = MongoClient("mongodb+srv://arkajit:arkajit@cluster0.dmii1.mongodb.net/?retryWrites=true&w=majority")
         self.db = self.client["DyClustering"]
     
-    def insert_data(self, collection, data) -> None:
+    def insert_data(self, collection, data):
         db_collection = self.db[collection]
-        db_collection.insert_one(data)
+        insert = db_collection.insert_one(data)
+        return insert.inserted_id
     
     def update_data(self, collection, filter, updated_data, multiple = False) -> None:
         db_collection = self.db[collection]

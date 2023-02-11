@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import logging
 import uvicorn
 from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points
-
+from clustering_utils import cluster
 
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s"
@@ -78,7 +78,7 @@ def add_event_route(item: dict):
 @app.post("/addDataPoint")
 def add_data_point(item: dict):
     try:
-        add_event_collection(event_name=item['schemaName'], parameters=item['parameters'])
+        data = add_event_collection(event_name=item['schemaName'], parameters=item['parameters'])
         logger.info("Data Point Added to the collection successfully")
     except Exception as e:
         logger.error("Issue in adding the data point in collection", exc_info=True)
@@ -88,6 +88,9 @@ def add_data_point(item: dict):
                 "message": "Error in adding the Data Point"
             }
         )
+        
+    cluster(event=item['schemaName'], data=data)
+    
     return JSONResponse(
         status_code=200,
         content={

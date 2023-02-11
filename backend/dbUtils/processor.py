@@ -84,7 +84,7 @@ def get_cluster_data_points(cluster_id, event_name):
     
         
 # Add Calls
-def add_event(name: str, parameters: list) -> None:
+def add_event(name: str, parameters: list):
     '''
         rules: 
             1. location -> gps
@@ -102,11 +102,12 @@ def add_event(name: str, parameters: list) -> None:
             continue
         rules.append([parameter['type'],parameter['name']])
     rules.extend(end)
-    CreateEvent(name=name, parameters=parameters, rules=rules)
+    
+    create_event_obj = CreateEvent(name=name, parameters=parameters, rules=rules)
 
 def add_event_collection(event_name, parameters) -> None:
-    EventCollection(event_name=event_name, parameters=parameters)
-
+    event_collection = EventCollection(event_name=event_name, parameters=parameters)
+    return event_collection.find_data(collection=event_name, filter={"_id": event_collection.inserted_id})
 
 # Update Calls
 def update_data_point(event_name, level, uuid, data_id):
