@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
 import uvicorn
-from dbUtils import get_all_schema_from_db
+from dbUtils import get_all_schema_from_db, add_event
 
 
 logging.basicConfig(
@@ -55,14 +55,22 @@ def get_all_event():
     )
 
 @app.post("/addEvent/")
-def add_schema(item: dict):
-    
-    
-    
+def add_event_route(item: dict):
+    try:
+        add_event(name=item['name'], parameters=item['parameters'])
+        logger.info("Event Added Succesfully")
+    except Exception as e:
+        logger.error("Issue in Adding the Event", exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "message": "Error"
+            }
+        )
     return JSONResponse(
         status_code=200,
         content={
-            "data": item
+            "message": "Event Added"
         }
     )
 
