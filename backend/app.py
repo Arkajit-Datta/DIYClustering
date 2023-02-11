@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
 import uvicorn
-from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points
+from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points
 
 
 logging.basicConfig(
@@ -105,9 +105,15 @@ def get_all_data_points(eventName: str):
         }
     )
 
-@app.get("/cluster/{clusterId}")
-def get_cluster_data(clusterId: str):
-    pass
+@app.get("/cluster/{eventName}/{clusterId}")
+def get_cluster_data(clusterId: str, eventName: str):
+    data = get_cluster_data_points(cluster_id=clusterId, event_name=eventName)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": data
+        }
+    )
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -56,8 +56,33 @@ def get_data_points(event_name):
             }
         )
     return data_list
-        
 
+def get_cluster_data_points(cluster_id, event_name):
+    datas = baseDb_obj.find_data(collection=event_name ,find = "multiple")
+    filtered_inside_cluster = []
+    for data in datas:
+        values = list(data.values())
+        if cluster_id in values:
+            filtered_inside_cluster.append(data)
+            
+    data_list = []
+    for index, data in enumerate(filtered_inside_cluster):
+        keys = list(data.keys())
+        res = {
+            key: data[key]
+            for key in keys
+            if not re.search(r"assigned_cluster_", key)
+        }
+        data_list.append(
+            {
+                "id": index+1,
+                "parameters": res,
+                "schemaName": event_name
+            }
+        )
+    return data_list
+    
+        
 # Add Calls
 def add_event(name: str, parameters: list) -> None:
     '''
