@@ -17,9 +17,12 @@ class baseDb:
             return 
         db_collection.update_one(filter=filter, update=updated_data)
     
-    def find_data(self, collection, filter = None):
+    def find_data(self, collection, filter = None, find = "one"):
         db_collection = self.db[collection]
-        return db_collection.find(filter) if filter else db_collection.find()
+        if find == "one":
+            return db_collection.find_one(filter) if filter else db_collection.find_one()
+        elif find == "multiple":
+            return db_collection.find(filter) if filter else db_collection.find()
 
 
         
