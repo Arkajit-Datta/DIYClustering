@@ -25,7 +25,7 @@ class DBscanGps:
                 vec.append(self.data[i])
         vec.extend(neg_vec)
         self.data = vec
-        return labels[-1]
+        print(labels)
 
 
 if __name__ == "__main__":
