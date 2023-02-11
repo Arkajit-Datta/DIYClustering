@@ -1,8 +1,10 @@
 from dbUtils.mongoDb import baseDb
 from dbUtils.create_event import CreateEvent, EventCollection
+import re
 
 baseDb_obj = baseDb()
 
+# Get Calls
 def get_all_schema_from_db():
     events = baseDb_obj.find_data(collection="events", find="multiple")
     return [
@@ -36,6 +38,27 @@ def get_tree(event_name):
     data = baseDb_obj.find_data(collection="events", filter={"name": event_name} ,find = "one")
     return data['tree']
 
+def get_data_points(event_name):
+    datas = baseDb_obj.find_data(collection=event_name ,find = "multiple")
+    data_list = []
+    for index, data in enumerate(datas):
+        keys = list(data.keys())
+        res = {
+            key: data[key]
+            for key in keys
+            if not re.search(r"assigned_cluster_", key)
+        }
+        data_list.append(
+            {
+                "id": index+1,
+                "parameters": res,
+                "schemaName": event_name
+            }
+        )
+    return data_list
+        
+
+# Add Calls
 def add_event(name: str, parameters: list) -> None:
     '''
         rules: 
@@ -56,5 +79,15 @@ def add_event(name: str, parameters: list) -> None:
     rules.extend(end)
     CreateEvent(name=name, parameters=parameters, rules=rules)
 
-def add_event():
-    pass
+def add_event_collection(event_name, parameters) -> None:
+    EventCollection(event_name=event_name, parameters=parameters)
+
+
+# Update Calls
+def update_data_point(event_name, level, uuid, data_id):
+    baseDb_obj.update_data(collection=event_name, filter={"_id": data_id}, updated_data={f"assigned_cluster_{level}": uuid})
+
+def update_tree_info(event_name, tree):
+    baseDb_obj.update_data(collection="events", filter={"name": event_name}, updated_data={"tree": tree})
+    
+    
