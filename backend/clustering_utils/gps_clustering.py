@@ -4,28 +4,21 @@ class DBscanGps:
     eps = 5
     min_samples = 2
     data = []
+    loc = []
     
-    def new_data(self,location):
-        self.data.append(location)
-        return self.dbscan_clustering()
+    def set_data(self,data):
+        self.data = data
 
-    def push_negatives_to_end(lst):
-        return [x for x in lst if x != -1] + [x for x in lst if x == -1]
+    def new_data(self,location):
+        for _,value in self.data:
+            self.loc.append(value)
+        self.loc.append(location)
+        return self.dbscan_clustering()
 
     def dbscan_clustering(self):
         dbscan = DBSCAN(eps = self.eps, min_samples=self.min_samples)
         dbscan.fit(np.array(self.data))
-        labels = dbscan.labels_
-        vec = []
-        neg_vec = []
-        for i in range(len(labels)):
-            if labels[i] == -1:
-                neg_vec.append(self.data[i])
-            else:
-                vec.append(self.data[i])
-        vec.extend(neg_vec)
-        self.data = vec
-        print(labels)
+        return dbscan.labels_
 
 
 if __name__ == "__main__":
