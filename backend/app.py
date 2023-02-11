@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
 import uvicorn
-from dbUtils import get_all_schema_from_db, add_event
+from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points
 
 
 logging.basicConfig(
@@ -77,10 +77,41 @@ def add_event_route(item: dict):
 
 @app.post("/addDataPoint")
 def add_data_point(item: dict):
+    try:
+        add_event_collection(event_name=item['schemaName'], parameters=item['parameters'])
+        logger.info("Data Point Added to the collection successfully")
+    except Exception as e:
+        logger.error("Issue in adding the data point in collection", exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "message": "Error in adding the Data Point"
+            }
+        )
     return JSONResponse(
         status_code=200,
         content={
-            "data": item
+            "message": "Data Point Added Succesfully & Clustering has commenced"
+        }
+    )
+
+@app.get("/getAllDataPoints/{eventName}")
+def get_all_data_points(eventName: str):
+    data = get_data_points(event_name=eventName)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": data
+        }
+    )
+
+@app.get("/cluster/{eventName}/{clusterId}")
+def get_cluster_data(clusterId: str, eventName: str):
+    data = get_cluster_data_points(cluster_id=clusterId, event_name=eventName)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": data
         }
     )
 
