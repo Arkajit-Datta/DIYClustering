@@ -1,8 +1,8 @@
 from mongoDb import baseDb
 
 class CreateEvent(baseDb):
-    def __init__(self, name: str, parameters: dict, rules: int) -> None:
-        super().__init__()
+    def __init__(self, name: str, parameters: dict, rules: int, mongo_client) -> None:
+        self.client = mongo_client
         self.structure = {
             "name": name,
             "tree": {"root":[]},
@@ -15,8 +15,8 @@ class CreateEvent(baseDb):
         
     
 class EventCollection(baseDb):
-    def __init__(self, event_name, parameters) -> None:
-        super().__init__()
+    def __init__(self, event_name, parameters, mongo_client) -> None:
+        self.client = mongo_client
         self.structure = {}.update(parameters)
         self.number_of_rules = None
         self._initialise_rules(event_name=event_name)
@@ -35,6 +35,3 @@ class EventCollection(baseDb):
             self.structure[f"assigned_cluster_{rule+1}"] = ""
         
         
-    
-    
-            
