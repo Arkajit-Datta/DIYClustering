@@ -1,8 +1,8 @@
 from dbUtils.mongoDb import baseDb
 
 class CreateEvent(baseDb):
-    def __init__(self, name: str, parameters: list, rules: list, mongo_client) -> None:
-        self.client = mongo_client
+    def __init__(self, name: str, parameters: list, rules: list) -> None:
+        super().__init__()
         self.structure = {
             "name": name,
             "tree": {"root":{}},
@@ -15,8 +15,8 @@ class CreateEvent(baseDb):
         
     
 class EventCollection(baseDb):
-    def __init__(self, event_name, parameters, mongo_client) -> None:
-        self.client = mongo_client
+    def __init__(self, event_name, parameters) -> None:
+        super().__init__()
         self.structure = {}.update(parameters)
         self.number_of_rules = None
         self._initialise_rules(event_name=event_name)
