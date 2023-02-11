@@ -32,6 +32,10 @@ def get_children_from_tree_node(event_name, uuid, level_of_rule):
     final_data.extend(outlayer)
     return final_data
 
+def get_tree(event_name):
+    data = baseDb_obj.find_data(collection="events", filter={"name": event_name} ,find = "one")
+    return data['tree']
+
 def add_event(name: str, parameters: list) -> None:
     '''
         rules: 
@@ -46,8 +50,11 @@ def add_event(name: str, parameters: list) -> None:
         if not parameter['cluster']:
             continue
         if parameter['type']  in {'location', 'similarity'}:
-            end.append(parameter['type'])
+            end.append([parameter['type'],parameter['name']])
             continue
-        rules.append(parameter['type'])
+        rules.append([parameter['type'],parameter['name']])
     rules.extend(end)
     CreateEvent(name=name, parameters=parameters, rules=rules)
+
+def add_event():
+    pass
