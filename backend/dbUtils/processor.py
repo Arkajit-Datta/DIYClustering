@@ -32,7 +32,7 @@ def get_children_from_tree_node(event_name, uuid, level_of_rule):
     final_data.extend(outlayer)
     return final_data
 
-def add_event(name: str, parameters: list):
+def add_event(name: str, parameters: list) -> None:
     '''
         rules: 
             1. location -> gps
@@ -50,4 +50,4 @@ def add_event(name: str, parameters: list):
             continue
         rules.append(parameter['type'])
     rules.extend(end)
-    CreateEvent(name=name, parameters=parameters, rules=rules, mongo_client=baseDb_obj.client)
+    CreateEvent(name=name, parameters=parameters, rules=rules)
