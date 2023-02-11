@@ -1,9 +1,9 @@
 from fastapi import FastAPI, File, UploadFile, Form
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
+import uvicorn
 from dbUtils import get_all_schema_from_db
 
 
@@ -34,8 +34,8 @@ def root():
         }
     )
 
-@app.get("/allSchema/")
-def get_all_schema():
+@app.get("/allEvent/")
+def get_all_event():
     logger.info("Getting the information of all schemas")
     try:
         data = get_all_schema_from_db()
@@ -53,4 +53,33 @@ def get_all_schema():
             "data": data
         }
     )
+
+@app.post("/addEvent/")
+def add_schema(item: dict):
     
+    
+    
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": item
+        }
+    )
+
+
+@app.post("/addDataPoint")
+def add_data_point(item: dict):
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": item
+        }
+    )
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app,
+        port=5000,
+        host="127.0.0.1",
+    )
+
