@@ -28,9 +28,9 @@ def get_children_from_tree_node(event_name, uuid, level_of_rule):
     outlayer, final_data = [],[]
     for child_key in children_keys:
         if child_key == -1:
-            outlayer.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule}": children[child_key]}, find="multiple"))
+            outlayer.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule+1}": children[child_key]}, find="multiple"))
             continue
-        final_data.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule}": children[child_key]}, find="multiple"))
+        final_data.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule+1}": children[child_key]}, find="multiple"))
     final_data.extend(outlayer)
     return final_data
 
