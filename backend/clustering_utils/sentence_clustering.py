@@ -10,13 +10,22 @@ class DBscanSentence:
     def new_data(self,sentence):
         embedding = self.model.encode(sentence) 
         self.data.append(embedding)
-        self.dbscan_clustering()
-
+        return self.dbscan_clustering()
+        
     def dbscan_clustering(self):
         dbscan = DBSCAN(eps = self.eps, min_samples=self.min_samples)
         dbscan.fit(np.array(self.data))
         labels = dbscan.labels_
-        print(labels)
+        vec = []
+        neg_vec = []
+        for i in range(len(labels)):
+            if labels[i] == -1:
+                neg_vec.append(self.data[i])
+            else:
+                vec.append(self.data[i])
+        vec.extend(neg_vec)
+        self.data = vec
+        return labels[-1]
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ class DBscanGps:
     
     def new_data(self,location):
         self.data.append(location)
-        self.dbscan_clustering()
+        return self.dbscan_clustering()
 
     def push_negatives_to_end(lst):
         return [x for x in lst if x != -1] + [x for x in lst if x == -1]
@@ -25,7 +25,7 @@ class DBscanGps:
                 vec.append(self.data[i])
         vec.extend(neg_vec)
         self.data = vec
-        print(labels)
+        return labels[-1]
 
 
 if __name__ == "__main__":
