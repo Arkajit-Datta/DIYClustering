@@ -16,21 +16,24 @@ def get_clustering_object(clustering_type,event_name, uuid, level_of_rule,parame
         obj = DBscanSentence()
         data = get_children_from_tree_node(event_name, uuid, level_of_rule)
         print(data,level_of_rule)
-        data = [[x["_id"],x[parameter]] for x in data]
-        obj.set_data(data)
-        return obj
+        return _extracted_from_get_clustering_object_6(data, parameter, obj)
     elif clustering_type == "location":
         obj = DBscanGps()
         data = get_children_from_tree_node(event_name, uuid, level_of_rule)
-        data = [[x["_id"],x[parameter]] for x in data]
-        obj.set_data(data)
-        return obj
+        return _extracted_from_get_clustering_object_6(data, parameter, obj)
     elif clustering_type == "range_clustering":
         return RangeClustering()
     elif clustering_type == "multiple_classifier":
         return MultipleClustering()
 
-def cluster(event,data):
+
+# TODO Rename this here and in `get_clustering_object`
+def _extracted_from_get_clustering_object_6(data, parameter, obj):
+    data = [[x["_id"],x[parameter]] for x in data]
+    obj.set_data(data)
+    return obj
+
+def cluster(event,data):  # sourcery skip: low-code-quality
     rules = get_rules(event)
     tree_info = get_tree(event)
     parent_node = "root"
@@ -42,7 +45,7 @@ def cluster(event,data):
             if str(cluster) in tree_info[parent_node].keys():
                 update_data_point(event,i,tree_info[parent_node][str(cluster)],data["_id"])
             else:
-                tree_info[parent_node][str(cluster)] = str(uuid.uuid1())
+                tree_info[parent_node][str(cluster)] = classifier + str(uuid.uuid1())
                 if i != len(rules) - 1:
                     tree_info[tree_info[parent_node][str(cluster)]] = {}
                     update_data_point(event,i,tree_info[parent_node][str(cluster)],data["_id"])
@@ -52,15 +55,15 @@ def cluster(event,data):
             for j,x in enumerate(cluster):
                 if j == len(cluster)-1:
                     if str(x) not in tree_info[parent_node].keys():
-                        tree_info[parent_node][str(x)] = str(uuid.uuid1())
+                        tree_info[parent_node][str(x)] = classifier + str(uuid.uuid1())
                     update_data_point(event,i,tree_info[parent_node][str(x)],data["_id"])
                     break
-                
+
                 if str(x) not in tree_info[parent_node].keys():
-                    tree_info[parent_node][str(x)] = str(uuid.uuid1())
+                    tree_info[parent_node][str(x)] = classifier + str(uuid.uuid1())
                 try:
                     update_data_point(event,i,tree_info[parent_node][str(x)],data1[j]["_id"])
-                except:
+                except Exception:
                     print(j,data1,i)
     update_tree_info(event,tree_info)
 
