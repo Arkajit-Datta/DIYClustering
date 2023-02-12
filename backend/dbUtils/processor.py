@@ -104,7 +104,8 @@ def add_event(name: str, parameters: list):
     rules.extend(end)
     
     create_event_obj = CreateEvent(name=name, parameters=parameters, rules=rules)
-
+    create_event_obj.insert()
+    
 def add_event_collection(event_name, parameters) -> None:
     event_collection = EventCollection(event_name=event_name, parameters=parameters)
     return event_collection.find_data(collection=event_name, filter={"_id": event_collection.inserted_id})
@@ -116,4 +117,16 @@ def update_data_point(event_name, level, uuid, data_id):
 def update_tree_info(event_name, tree):
     baseDb_obj.update_data(collection="events", filter={"name": event_name}, updated_data={"tree": tree})
     
+def update_event(name: str, parameters: list):
+    rules, end = [],[]
+    for parameter in parameters:
+        if not parameter['cluster']:
+            continue
+        if parameter['type']  in {'location', 'similarity'}:
+            end.append([parameter['type'],parameter['name']])
+            continue
+        rules.append([parameter['type'],parameter['name']])
+    rules.extend(end)
     
+    create_event_obj = CreateEvent(name=name, parameters=parameters, rules=rules)
+    create_event_obj.update()

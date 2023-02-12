@@ -11,7 +11,11 @@ class CreateEvent(baseDb):
             "parameters": parameters, 
         }
         
-        self.inserted_id = self.insert_data(collection="events", data = self.structure)
+    def insert(self):
+        inserted_id = self.insert_data(collection="events", data = self.structure)
+    
+    def update(self):
+        self.update_data(collection="events",filter={"name":self.structure["name"]},updated_data=self.structure,multiple=False)
         
     
 class EventCollection(baseDb):
