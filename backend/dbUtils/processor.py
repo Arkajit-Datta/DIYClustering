@@ -28,9 +28,9 @@ def get_children_from_tree_node(event_name, uuid, level_of_rule):
     outlayer, final_data = [],[]
     for child_key in children_keys:
         if child_key == -1:
-            outlayer.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule}": children[child_key]}, find="multiple"))
+            outlayer.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule+1}": children[child_key]}, find="multiple"))
             continue
-        final_data.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule}": children[child_key]}, find="multiple"))
+        final_data.extend(baseDb_obj.find_data(collection=event_name, filter={f"assigned_cluster_{level_of_rule+1}": children[child_key]}, find="multiple"))
     final_data.extend(outlayer)
     return final_data
 
@@ -104,7 +104,8 @@ def add_event(name: str, parameters: list):
     rules.extend(end)
     
     create_event_obj = CreateEvent(name=name, parameters=parameters, rules=rules)
-
+    create_event_obj.insert()
+    
 def add_event_collection(event_name, parameters) -> None:
     event_collection = EventCollection(event_name=event_name, parameters=parameters)
     return event_collection.find_data(collection=event_name, filter={"_id": event_collection.inserted_id})
@@ -116,4 +117,16 @@ def update_data_point(event_name, level, uuid, data_id):
 def update_tree_info(event_name, tree):
     baseDb_obj.update_data(collection="events", filter={"name": event_name}, updated_data={"tree": tree})
     
+def update_event(name: str, parameters: list):
+    rules, end = [],[]
+    for parameter in parameters:
+        if not parameter['cluster']:
+            continue
+        if parameter['type']  in {'location', 'similarity'}:
+            end.append([parameter['type'],parameter['name']])
+            continue
+        rules.append([parameter['type'],parameter['name']])
+    rules.extend(end)
     
+    create_event_obj = CreateEvent(name=name, parameters=parameters, rules=rules)
+    create_event_obj.update()

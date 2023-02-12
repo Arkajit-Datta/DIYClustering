@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
 import uvicorn
-from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points
+from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points, update_event
 from clustering_utils import cluster
 
 logging.basicConfig(
@@ -58,6 +58,26 @@ def get_all_event():
 def add_event_route(item: dict):
     try:
         add_event(name=item['name'], parameters=item['parameters'])
+        logger.info("Event Added Succesfully")
+    except Exception as e:
+        logger.error("Issue in Adding the Event", exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "message": "Error"
+            }
+        )
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message": "Event Added"
+        }
+    )
+
+@app.post("/updateEvent")
+def updateEvent(item: dict):
+    try:
+        update_event(name=item['name'], parameters=item['parameters'])
         logger.info("Event Added Succesfully")
     except Exception as e:
         logger.error("Issue in Adding the Event", exc_info=True)
