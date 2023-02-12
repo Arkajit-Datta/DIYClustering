@@ -3,8 +3,11 @@ import { AnimatedTree } from 'react-tree-graph'
 import 'react-tree-graph/dist/style.css'
 import './styles.css'
 
-import { treeData as rootNode } from '../../store/data';
-import { Typography } from '@mui/material';
+import { baseURL, treeData as rootNode } from '../../store/data';
+import { MenuItem, TextField, Typography } from '@mui/material';
+import Loader from '../loader/Loader';
+
+import axios from 'axios';
 
 const DEFAULT_DEPTH = 9
 const cloneWithDepth = (object, depth = DEFAULT_DEPTH) => {
@@ -34,21 +37,7 @@ const cloneWithDepth = (object, depth = DEFAULT_DEPTH) => {
     return clone
 }
 
-const findNode = (key, node = rootNode, parentPath = []) => {
-    const path = [...parentPath, node.name]
 
-    if (node.name === key) {
-        return { node: cloneWithDepth(node), path }
-    }
-
-    if (Array.isArray(node.children)) {
-        for (const child of node.children) {
-            const found = findNode(key, child, path)
-
-            if (found) return found
-        }
-    }
-}
 
 const useWindowInnerSize = () => {
     const [innerWidth, setInnerWidth] = useState(window.innerWidth)
@@ -70,19 +59,74 @@ const useWindowInnerSize = () => {
         innerHeight,
     }
 }
-export default function Cluster({darkMode}) {
+export default function Cluster({ darkMode }) {
     const [data, setData] = useState(cloneWithDepth(rootNode))
     const [path, setPath] = useState([rootNode.name])
     const [canvasWidth, setCanvasWidth] = useState(0)
     const [canvasHeight, setCanvasHeight] = useState(0)
     const { innerWidth, innerHeight } = useWindowInnerSize()
     const canvasWrapper = useRef(null)
+
+
+    const [schema, setschema] = useState('');
+    const [schemas, setschemas] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        console.log("Calling tree for schema", schema);
+        setLoading(true);
+        // const timer = setTimeout(() => {
+        //     setLoading(false)
+        //     setData(cloneWithDepth(rootNode))
+        // }, 2000);
+        axios.get(baseURL + "/getTree/"+schema).then((response) => {
+            setData(cloneWithDepth(response.data.data));
+            setPath([response.data.data.name])
+        }).finally(()=>{
+            setLoading(false)
+        });
+    }, [schema]);
+
+    useEffect(() => {
+        console.log("Calling for all Schemas");
+        setLoading(true);
+
+        axios.get(baseURL + "/allEvent/").then((response) => {
+            setschemas(response.data.data);
+        }).finally(()=>{
+            setLoading(false)
+        });
+    }, []);
+
+    const findNode = (key, node = data, parentPath = []) => {
+        const path = [...parentPath, node.name]
+    
+        if (node.name === key) {
+            return { node: cloneWithDepth(node), path }
+        }
+    
+        if (Array.isArray(node.children)) {
+            for (const child of node.children) {
+                const found = findNode(key, child, path)
+    
+                if (found) return found
+            }
+        }
+    }
+
+    const handleSchemaChange = (e) => {
+        setschema(e.target.value);
+    }
+
     const setCanvasSize = useCallback(() => {
         const { clientWidth, clientHeight } = canvasWrapper.current
 
         setCanvasWidth(clientWidth)
         setCanvasHeight(clientHeight)
     }, [])
+
+
+
 
     useEffect(setCanvasSize, [setCanvasSize])
 
@@ -106,16 +150,23 @@ export default function Cluster({darkMode}) {
     const handleClick = (_, key) => {
         changeNode(findNode(key))
     }
+    let handleClusterOpen = (ev, key) => {
+        ev.preventDefault();
+        console.log(path);
+        let res = findNode(key);
+        res.path.push(schema)
+        window.open('/cluster/'+ res.path)
+    }
 
     return (
         <div style={{
             flexGrow: 1,
             display: 'flex',
             flexDirection: 'column',
-            height: "100%"
+            height: "100%",
         }}>
             <div style={{ height: "100%" }}>
-                <div style={{ height: "100%" }}>
+                <div style={{ height: "100%", display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingInline: "2%" }}>
                     {path.map((path, index) => (
                         <button
                             style={{
@@ -125,7 +176,7 @@ export default function Cluster({darkMode}) {
                                 background: 'none',
                                 padding: '0 0.1rem',
                                 cursor: data.name === path ? '' : 'pointer',
-                                color: data.name === path ? (darkMode?'white':'black') : 'blue',
+                                color: data.name === path ? (darkMode ? 'white' : 'black') : 'blue',
                             }}
                             key={path}
                             onClick={() => changeNode(findNode(path))}
@@ -135,28 +186,45 @@ export default function Cluster({darkMode}) {
                             </Typography>
                         </button>
                     ))}
+                    <TextField
+                        id="outlined-basic"
+                        select
+                        style={{ width: '20%' }}
+                        label="Select"
+                        color='warning'
+                        onChange={handleSchemaChange}
+                        focused
+                    >
+                        {schemas.map((option, i) => (
+                            <MenuItem key={i} value={option.name}>
+                                <Typography style={{ color: darkMode ? 'rgb(0, 196, 144)' : 'black' }}>{option.name}</Typography>
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </div>
             </div>
-            <div style={{ flexGrow: 1 }} ref={canvasWrapper}>
-                <AnimatedTree
-                    animated
-                    data={data}
-                    width={1600}
-                    height={1600}
-                    nodeProps={{
-                        "r": 20
-                    }}
-                    textProps={{
-                        size: '50px',
-                        transform: 'rotate(-90)',
-                        fill:darkMode?'white':'black'
-                    }}
-                    nodeShape="circle"
-                    svgProps={{ transform: 'rotate(90)' }}
-                    gProps={{ className: 'node', onClick: handleClick }}
-                    margins={{ top: 0, bottom: 100, left: 60, right: 950 }}
-                />
-            </div>
+            {loading ? <Loader /> :
+               data&& <div style={{ flexGrow: 1 }} ref={canvasWrapper}>
+                    <AnimatedTree
+                        animated
+                        data={data}
+                        width={1450}
+                        height={1450}
+                        nodeProps={{
+                            "r": 20
+                        }}
+                        textProps={{
+                            size: '50px',
+                            transform: 'rotate(-90)',
+                            fill: darkMode ? 'white' : 'black'
+                        }}
+                        nodeShape="circle"
+                        svgProps={{ transform: 'rotate(90)' }}
+                        gProps={{ className: 'node', onClick: handleClick, onContextMenu: handleClusterOpen }}
+                        margins={{ top: 0, bottom: 140, left: 30, right: 950 }}
+                    />
+                </div>
+            }
         </div>
     )
 }

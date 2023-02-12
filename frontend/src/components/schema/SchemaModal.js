@@ -1,6 +1,7 @@
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { paramTypes } from '../../store/data';
+import axios from 'axios';
+import { baseURL, clusterTypes } from '../../store/data';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
@@ -16,7 +17,7 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-function SchemaModal({ data, handleClose }) {
+function SchemaModal({ data, handleClose ,darkMode}) {
 
     const [schemaData, setSchemaData] = useState(data.parameters);
 
@@ -32,12 +33,23 @@ function SchemaModal({ data, handleClose }) {
             schemaName: formData.get('schemaName')
         };
         updateSchema(rawData);
+        let newData={
+            id:data.id,
+            parameters:schemaData,
+            name:data.name,
+        }
         if(data.name==null){
-            data.name=rawData.schemaName
+            newData.name=rawData.schemaName
         }
         data.parameters=schemaData;
         console.log(data);
+        newData.parameters[1].default=parseInt(newData.parameters[1].default);
         //code to call for API for update
+        axios
+        .post(baseURL+"/addEvent/", newData)
+        .then((response) => {
+          console.log("Schema update response","")
+        });
         handleClose()
     };
 
@@ -54,9 +66,9 @@ function SchemaModal({ data, handleClose }) {
         });
     }
 
-    let removeParameter = (name) => {
+    let removeParameter = (id) => {
         setSchemaData((data) => {
-            data = data.filter((param) => param.name != name);
+            data = reformatIds(data.filter((param) => param.id != id));
             return data;
         });
     }
@@ -64,18 +76,26 @@ function SchemaModal({ data, handleClose }) {
     console.log(schemaData)
     let addParameter = () => {
         let newData=schemaData;
-        setSchemaData([...schemaData,
+        newData=reformatIds(newData)
+        setSchemaData([...newData,
             {
                 id: newData.length + 1,
                 name: "",
-                type: "text",
+                type: "location",
                 default: "",
                 cluster: false
             }
         ]);
         
     }
-
+    const reformatIds=(oldData)=>{
+        let newData=oldData;
+        newData=newData.map((val,i)=>{
+            val.id=i+1;
+            return val;
+        })
+        return newData;
+    }
     return (
         <div>
             <Box sx={style}>
@@ -122,7 +142,7 @@ function SchemaModal({ data, handleClose }) {
                                     name='type'
                                     defaultValue={parameter.type}
                                 >
-                                    {paramTypes.map((option) => (
+                                    {clusterTypes.map((option) => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.label}
                                         </MenuItem>
@@ -130,10 +150,10 @@ function SchemaModal({ data, handleClose }) {
                                 </TextField>
                                 <TextField id="outlined-basic" name='defaultValue' label="Default Value" variant="outlined" style={{ width: '25%' }} defaultValue={parameter.default} />
                                 <FormControlLabel
-                                    label="cluster"
+                                    label={<Typography style={{}}>Cluster</Typography>}
                                     control={<Checkbox name='cluster' value={parameter.id} defaultChecked={parameter.cluster} />}
                                 />
-                                <RemoveCircleIcon style={{ color: "red" }} onClick={() => removeParameter(parameter.name)} />
+                                <RemoveCircleIcon style={{ color: "red" }} onClick={() => removeParameter(parameter.id)} />
                             </Box>
 
                         )

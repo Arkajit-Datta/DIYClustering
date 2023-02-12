@@ -6,6 +6,7 @@ import {Box, Grid} from "@mui/material";
 import Data from './data/Data';
 import Schema from './schema/Schema';
 import Cluster from './cluster/Cluster';
+import ClusterView from './cluster/ClusterView';
 
 export default function BaseLayout() {
    let [darkMode, setDarkMode] = useState(false);
@@ -36,9 +37,10 @@ export default function BaseLayout() {
             </Grid>
             <Grid item flexGrow={1}>
                <Routes>
-                  <Route exact path={'/'} element={<Schema/>}/>
-                  <Route exact path={'/about'} element={<Data/>}/>
+                  <Route exact path={'/'} element={<Schema darkMode={darkMode}/>}/>
+                  <Route exact path={'/about'} element={<Data darkMode={darkMode}/>}/>
                   <Route exact path={'/cluster'} element={<Cluster darkMode={darkMode}/>}/>
+                  <Route exact path={'/cluster/:id'} element={<ClusterView darkMode={darkMode}/>}/>
                </Routes>
             </Grid>
          </Grid>
