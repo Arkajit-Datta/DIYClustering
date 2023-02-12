@@ -11,8 +11,8 @@ Link for docker hub Image https://hub.docker.com/repository/docker/sammy227799/d
 
 
 ### UI Flow:
--- Addition of an Event(Sceham) where the user decides which attributes of the schema they want to cluster upon (dynamic nature)
--- Addition of data points with respect to that Event. These are the data points on which the cllustering happens
--- View Clusters forming in Real time
--- View individual clusters and the data points associated to that cluster
--- Allows to group data points based on dynamic attributes and lets the user visualise that on the UI using tree based graph
+1) Addition of an Event(Sceham) where the user decides which attributes of the schema they want to cluster upon (dynamic nature)
+2) Addition of data points with respect to that Event. These are the data points on which the cllustering happens
+3) View Clusters forming in Real time
+4) View individual clusters and the data points associated to that cluster
+5) Allows to group data points based on dynamic attributes and lets the user visualise that on the UI using tree based graph
