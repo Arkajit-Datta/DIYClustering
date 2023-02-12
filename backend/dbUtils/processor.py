@@ -46,7 +46,7 @@ def get_data_points(event_name):
         res = {
             key: data[key]
             for key in keys
-            if not re.search(r"assigned_cluster_", key)
+            if not re.search(r"assigned_cluster_", key) and key != "_id"
         }
         data_list.append(
             {
@@ -55,6 +55,7 @@ def get_data_points(event_name):
                 "schemaName": event_name
             }
         )
+    print(data_list)
     return data_list
 
 def get_cluster_data_points(cluster_id, event_name):

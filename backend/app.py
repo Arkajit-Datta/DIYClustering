@@ -6,7 +6,7 @@ import logging
 import uvicorn
 from dbUtils import get_all_schema_from_db, add_event, add_event_collection, get_data_points, get_cluster_data_points, update_event
 from clustering_utils import cluster
-
+from make_tree import FormatTree
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s"
 )
@@ -137,6 +137,30 @@ def get_cluster_data(clusterId: str, eventName: str):
             "data": data
         }
     )
+
+@app.get("/getTree/{eventName}")
+def get_tree(eventName: str):
+    
+    try:
+        tree = FormatTree().format_tree(event_name=eventName)
+    except Exception as e:
+        logger.error("There was an error in formatting the tree")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "message":"Error in formatting the tree" 
+            }
+        )
+    return JSONResponse(
+        status_code=200,
+        content={
+            "data": tree
+        }
+    )
+    
+
+
+
 
 if __name__ == "__main__":
     uvicorn.run(

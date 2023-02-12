@@ -1,0 +1,26 @@
+import sys
+import os
+
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.abspath(os.path.join(TEST_DIR, "../"))
+sys.path.insert(0, PROJECT_DIR)
+
+from dbUtils import get_tree
+
+class FormatTree:
+
+    def dfs(self, node):
+        store = {'name': node, 'children': []}
+        if node in self.tree:
+            for key in self.tree[node]:
+                child = self.tree[node][key]
+                store['children'].append(self.dfs(child))
+        return store
+        
+    def format_tree(self, event_name):
+        self.tree = get_tree(event_name=event_name)
+        return self.dfs("root")
+    
+if __name__ == "__main__":
+    obj = FormatTree().format_tree(event_name="Event Car")
+    print(obj)
