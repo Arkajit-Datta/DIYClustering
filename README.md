@@ -1,4 +1,4 @@
-# TRINIT_594092-UX67B97S_DEV4
+# DIYClustering
 
 Link for docker hub Image https://hub.docker.com/repository/docker/sammy227799/dev404/general
 ![image](https://user-images.githubusercontent.com/78228462/218290682-c2a46f28-8a8e-4680-b3b0-c39ea14d7605.png)
