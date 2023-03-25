@@ -11,7 +11,7 @@ class FormatTree:
 
     def dfs(self, node):
         name = self.name_formatter(node)
-        store = {'name': name, 'clusterID': node, 'children': []}
+        store = {'name': node, 'label': name, 'children': []}
         if node in self.tree:
             for key in self.tree[node]:
                 child = self.tree[node][key]
@@ -20,7 +20,11 @@ class FormatTree:
     
     def name_formatter(self, name):
         splitted_name = name.split("_")
-        return f"{splitted_name[0]} ({splitted_name[1]})"
+        try:
+            result = f"{splitted_name[0]} ({splitted_name[1]})"
+        except Exception as e:
+            result = name
+        return result
     
     def format_tree(self, event_name):
         self.tree = get_tree(event_name=event_name)

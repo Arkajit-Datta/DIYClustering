@@ -144,7 +144,7 @@ def get_tree(eventName: str):
     try:
         tree = FormatTree().format_tree(event_name=eventName)
     except Exception as e:
-        logger.error("There was an error in formatting the tree")
+        logger.error(f"There was an error in formatting the tree, {str(e)}", exc_info=True)
         return JSONResponse(
             status_code=500,
             content={
@@ -158,10 +158,6 @@ def get_tree(eventName: str):
         }
     )
     
-
-
-
-
 if __name__ == "__main__":
     uvicorn.run(
         app,
