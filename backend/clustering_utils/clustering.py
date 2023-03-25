@@ -34,8 +34,6 @@ def _extracted_from_get_clustering_object_6(data, parameter, obj):
     return obj
 
 def cluster(event,data):   # sourcery skip: low-code-quality
-    if isinstance(data, str):
-        data = data.lower()
     rules = get_rules(event)
     tree_info = get_tree(event)
     parent_node = "root"
@@ -49,7 +47,7 @@ def cluster(event,data):   # sourcery skip: low-code-quality
                 update_data_point(event,i,tree_info[parent_node][str(cluster)],data["_id"])
             else:
                 # tree_info[parent_node][str(cluster)] = classifier + str(uuid.uuid1())
-                tree_info[parent_node][str(cluster)] = f"{classifier}_{data}_{uuid.uuid1()}"
+                tree_info[parent_node][str(cluster)] = f"{classifier}/{data[parameter]}/{uuid.uuid1()}"
                 if i != len(rules) - 1:
                     tree_info[tree_info[parent_node][str(cluster)]] = {}
                     update_data_point(event,i,tree_info[parent_node][str(cluster)],data["_id"])
@@ -60,13 +58,13 @@ def cluster(event,data):   # sourcery skip: low-code-quality
                 if j == len(cluster)-1:
                     if str(x) not in tree_info[parent_node].keys():
                         # tree_info[parent_node][str(x)] = classifier + str(uuid.uuid1())
-                        tree_info[parent_node][str(x)] = f"{classifier}_{x}_{uuid.uuid1()}"
+                        tree_info[parent_node][str(x)] = f"{classifier}/{x}/{uuid.uuid1()}"
                     update_data_point(event,i,tree_info[parent_node][str(x)],data["_id"])
                     break
 
                 if str(x) not in tree_info[parent_node].keys():
                     # tree_info[parent_node][str(x)] = classifier + str(uuid.uuid1())
-                    tree_info[parent_node][str(x)] = f"{classifier}_{x}_{uuid.uuid1()}"
+                    tree_info[parent_node][str(x)] = f"{classifier}/{x}/{uuid.uuid1()}"
                 try:
                     update_data_point(event,i,tree_info[parent_node][str(x)],data1[j]["_id"])
                 except Exception:

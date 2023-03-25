@@ -19,9 +19,9 @@ class FormatTree:
         return store
     
     def name_formatter(self, name):
-        splitted_name = name.split("_")
+        splitted_name = name.split("/")
         try:
-            result = f"{splitted_name[0]} ({splitted_name[1]})"
+            result = f"{splitted_name[1]} ({splitted_name[0]})"
         except Exception as e:
             result = name
         return result
