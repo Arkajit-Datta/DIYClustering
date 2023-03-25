@@ -9,6 +9,7 @@ class RangeClustering:
         self.range = range
     
     def new_data(self,data):
+        data = int(data)
         width = max(self.range)/self.division_parameter
         return data//width
             
