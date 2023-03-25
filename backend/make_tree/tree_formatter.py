@@ -10,13 +10,18 @@ from dbUtils import get_tree
 class FormatTree:
 
     def dfs(self, node):
-        store = {'name': node, 'children': []}
+        name = self.name_formatter(node)
+        store = {'name': name, 'clusterID': node, 'children': []}
         if node in self.tree:
             for key in self.tree[node]:
                 child = self.tree[node][key]
                 store['children'].append(self.dfs(child))
         return store
-        
+    
+    def name_formatter(self, name):
+        splitted_name = name.split("_")
+        return f"{splitted_name[0]} ({splitted_name[1]})"
+    
     def format_tree(self, event_name):
         self.tree = get_tree(event_name=event_name)
         return self.dfs("root")

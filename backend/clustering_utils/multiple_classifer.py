@@ -2,8 +2,6 @@ class MultipleClustering:
     classes = []
     
     def new_data(self,data):
-        if data in self.classes:
-            return self.classes.index(data)
-        else:
+        if data not in self.classes:
             self.classes.append(data)
-            return self.classes.index(data)
+        return self.classes.index(data)

@@ -15,6 +15,7 @@ def get_all_schema_from_db():
         }
         for index, event in enumerate(events)
     ]
+    
 def get_rules(event_name):
     data = baseDb_obj.find_data(collection="events", filter={"name": event_name} ,find = "one")
     return data['rules']

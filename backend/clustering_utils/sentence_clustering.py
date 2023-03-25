@@ -25,8 +25,7 @@ class DBscanSentence:
     def dbscan_clustering(self):
         dbscan = DBSCAN(eps = self.eps, min_samples=self.min_samples)
         dbscan.fit(np.array(self.encodings))
-        labels = dbscan.labels_
-        return labels
+        return dbscan.labels_
 
 
 if __name__ == "__main__":
